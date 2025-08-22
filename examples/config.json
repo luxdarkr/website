@@ -1,0 +1,60 @@
+{
+  "python": {
+    "category": "Python",
+    "examples": [
+      {
+        "id": "hello",
+        "name": "Hello World",
+        "description": "Простая программа выводящая приветствие",
+        "file": "python/hello.py"
+      },
+      {
+        "id": "fibonacci",
+        "name": "Числа Фибоначчи",
+        "description": "Рекурсивное вычисление чисел Фибоначчи",
+        "file": "python/fibonacci.py"
+      },
+      {
+        "id": "calculator",
+        "name": "Калькулятор",
+        "description": "Простой калькулятор с вводом данных",
+        "file": "python/calculator.py"
+      },
+      {
+        "id": "guess_number",
+        "name": "Угадай число",
+        "description": "Игра где компьютер загадывает число",
+        "file": "python/guess_number.py"
+      }
+    ]
+  },
+  "cpp": {
+    "category": "C++",
+    "examples": [
+      {
+        "id": "hello",
+        "name": "Hello World",
+        "description": "Базовая программа на C++",
+        "file": "cpp/hello.cpp"
+      },
+      {
+        "id": "factorial",
+        "name": "Факториал",
+        "description": "Рекурсивное вычисление факториала",
+        "file": "cpp/factorial.cpp"
+      },
+      {
+        "id": "calculator",
+        "name": "Калькулятор",
+        "description": "Калькулятор на C++ с switch-case",
+        "file": "cpp/calculator.cpp"
+      },
+      {
+        "id": "prime_numbers",
+        "name": "Простые числа",
+        "description": "Поиск простых чисел до N",
+        "file": "cpp/prime_numbers.cpp"
+      }
+    ]
+  }
+}
