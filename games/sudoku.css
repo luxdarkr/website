@@ -1,0 +1,375 @@
+.sudoku-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.sudoku-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 1px;
+    background: #333;
+    border: 2px solid #333;
+    margin: 1rem 0;
+}
+
+.sudoku-cell {
+    aspect-ratio: 1;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.sudoku-cell:hover {
+    background: #f0f8ff;
+}
+
+.sudoku-cell.fixed {
+    background: #f8f9fa;
+    color: #000;
+    font-weight: bold;
+}
+
+.sudoku-cell.error {
+    background: #ffe6e6;
+    color: #ff6b6b;
+}
+
+.sudoku-cell.selected {
+    background: #e3f2fd;
+    box-shadow: inset 0 0 0 2px #2196f3;
+}
+
+.sudoku-cell.highlighted {
+    background: #f5f5f5;
+}
+
+.sudoku-cell.same-number {
+    background: #fff8e1;
+}
+
+/* Границы для блоков 3x3 */
+.sudoku-cell:nth-child(3n) {
+    border-right: 2px solid #333;
+}
+
+.sudoku-cell:nth-child(9n) {
+    border-right: none;
+}
+
+.sudoku-cell:nth-child(n+19):nth-child(-n+27),
+.sudoku-cell:nth-child(n+46):nth-child(-n+54) {
+    border-bottom: 2px solid #333;
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.number-btn {
+    padding: 1rem;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.number-btn:hover {
+    background: #5a67d8;
+    transform: translateY(-2px);
+}
+
+.number-btn:active {
+    transform: translateY(0);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+    min-width: 120px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+.action-btn.secondary {
+    background: #6c757d;
+}
+
+.action-btn.secondary:hover {
+    background: #5a6268;
+}
+
+.action-btn.success {
+    background: #28a745;
+}
+
+.action-btn.success:hover {
+    background: #218838;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.timer {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #667eea;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.difficulty {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.difficulty-btn {
+    padding: 0.5rem 1rem;
+    background: #e9ecef;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.difficulty-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.difficulty-btn:hover:not(.active) {
+    background: #dee2e6;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.8rem 1.5rem;
+    background: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.back-btn:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-value {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 1.1rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.game-message {
+    text-align: center;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.game-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.game-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.game-message.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+@media (max-width: 768px) {
+    .sudoku-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .sudoku-cell {
+        font-size: 1.1rem;
+    }
+    
+    .controls {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.3rem;
+    }
+    
+    .number-btn {
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        min-width: auto;
+    }
+    
+    .game-info {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .difficulty {
+        justify-content: center;
+    }
+}
+
+.action-btn.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.action-btn.warning {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+}
+
+.size-selector {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.size-btn {
+    padding: 0.5rem 1rem;
+    background: #e9ecef;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.size-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.size-btn:hover:not(.active) {
+    background: #dee2e6;
+}
+
+/* Стили для разных размеров сетки */
+.sudoku-grid.size-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.sudoku-grid.size-6 {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.sudoku-grid.size-9 {
+    grid-template-columns: repeat(9, 1fr);
+}
+
+/* Границы для разных размеров */
+.sudoku-grid.size-4 .sudoku-cell:nth-child(2n) {
+    border-right: 2px solid #333;
+}
+
+.sudoku-grid.size-4 .sudoku-cell:nth-child(4n) {
+    border-right: none;
+}
+
+.sudoku-grid.size-4 .sudoku-cell:nth-child(n+5):nth-child(-n+8) {
+    border-bottom: 2px solid #333;
+}
+
+.sudoku-grid.size-6 .sudoku-cell:nth-child(3n) {
+    border-right: 2px solid #333;
+}
+
+.sudoku-grid.size-6 .sudoku-cell:nth-child(6n) {
+    border-right: none;
+}
+
+.sudoku-grid.size-6 .sudoku-cell:nth-child(n+13):nth-child(-n+18),
+.sudoku-grid.size-6 .sudoku-cell:nth-child(n+31):nth-child(-n+36) {
+    border-bottom: 2px solid #333;
+}
