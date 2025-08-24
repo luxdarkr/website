@@ -1,5 +1,5 @@
 .sudoku-container {
-    max-width: 600px;
+    max-width: 800px;
     margin: 2rem auto;
     background: white;
     padding: 2rem;
@@ -7,22 +7,50 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
+.sudoku-grid {
+    display: grid;
+    margin: 1rem 0;
+    border: 2px solid #333;
+    background: #333;
+    gap: 1px;
+}
+
+/* Размеры сеток */
+.sudoku-grid.size-4 { grid-template-columns: repeat(4, 1fr); }
+.sudoku-grid.size-6 { grid-template-columns: repeat(6, 1fr); }
+.sudoku-grid.size-9 { grid-template-columns: repeat(9, 1fr); }
+.sudoku-grid.size-10 { grid-template-columns: repeat(10, 1fr); }
+.sudoku-grid.size-12 { grid-template-columns: repeat(12, 1fr); }
+.sudoku-grid.size-14 { grid-template-columns: repeat(14, 1fr); }
+.sudoku-grid.size-15 { grid-template-columns: repeat(15, 1fr); }
+.sudoku-grid.size-16 { grid-template-columns: repeat(16, 1fr); }
+.sudoku-grid.size-20 { grid-template-columns: repeat(20, 1fr); }
+.sudoku-grid.size-25 { grid-template-columns: repeat(25, 1fr); }
+
+.sudoku-cell {
+    aspect-ratio: 1;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    position: relative;
+    border: 1px solid #ddd;
+}
+
 .sudoku-cell:hover {
     background: #f0f8ff;
 }
 
-/* Убедимся, что у фиксированных ячеек можно снять выделение */
 .sudoku-cell.fixed {
     background: #f8f9fa;
     color: #000;
     font-weight: bold;
     cursor: default;
-}
-
-/* Выделение должно работать даже для фиксированных ячеек */
-.sudoku-cell.fixed.selected {
-    background: #e3f2fd;
-    box-shadow: inset 0 0 0 2px #2196f3;
 }
 
 .sudoku-cell.error {
@@ -33,6 +61,7 @@
 .sudoku-cell.selected {
     background: #e3f2fd;
     box-shadow: inset 0 0 0 2px #2196f3;
+    z-index: 2;
 }
 
 .sudoku-cell.highlighted {
@@ -43,23 +72,43 @@
     background: #fff8e1;
 }
 
-/* Границы для блоков 3x3 */
-.sudoku-cell:nth-child(3n) {
-    border-right: 2px solid #333;
+/* Границы блоков */
+.sudoku-cell.border-right {
+    border-right: 2px solid #333 !important;
 }
 
-.sudoku-cell:nth-child(9n) {
-    border-right: none;
+.sudoku-cell.border-bottom {
+    border-bottom: 2px solid #333 !important;
 }
 
-.sudoku-cell:nth-child(n+19):nth-child(-n+27),
-.sudoku-cell:nth-child(n+46):nth-child(-n+54) {
-    border-bottom: 2px solid #333;
+/* Убираем лишние границы по краям */
+.sudoku-cell.no-border-right {
+    border-right: 1px solid #ddd !important;
+}
+
+.sudoku-cell.no-border-bottom {
+    border-bottom: 1px solid #ddd !important;
+}
+
+/* Стили для разных размеров ячеек */
+.sudoku-grid.size-10 .sudoku-cell,
+.sudoku-grid.size-12 .sudoku-cell,
+.sudoku-grid.size-14 .sudoku-cell,
+.sudoku-grid.size-15 .sudoku-cell,
+.sudoku-grid.size-16 .sudoku-cell,
+.sudoku-grid.size-20 .sudoku-cell,
+.sudoku-grid.size-25 .sudoku-cell {
+    font-size: 1rem;
+}
+
+.sudoku-grid.size-20 .sudoku-cell,
+.sudoku-grid.size-25 .sudoku-cell {
+    font-size: 0.8rem;
 }
 
 .controls {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
     gap: 0.5rem;
     margin: 1rem 0;
 }
@@ -81,8 +130,8 @@
     transform: translateY(-2px);
 }
 
-.number-btn:active {
-    transform: translateY(0);
+.number-btn.hidden {
+    display: none;
 }
 
 .action-buttons {
@@ -94,7 +143,6 @@
 
 .action-btn {
     padding: 1rem 1.5rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -110,24 +158,12 @@
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-.action-btn:active {
-    transform: translateY(0);
+.action-btn.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.action-btn.secondary {
-    background: #6c757d;
-}
-
-.action-btn.secondary:hover {
-    background: #5a6268;
-}
-
-.action-btn.success {
-    background: #28a745;
-}
-
-.action-btn.success:hover {
-    background: #218838;
+.action-btn.warning {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
 }
 
 .game-info {
@@ -173,6 +209,33 @@
 }
 
 .difficulty-btn:hover:not(.active) {
+    background: #dee2e6;
+}
+
+.size-selector {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.size-btn {
+    padding: 0.5rem 1rem;
+    background: #e9ecef;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.size-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.size-btn:hover:not(.active) {
     background: #dee2e6;
 }
 
@@ -248,6 +311,7 @@
     border: 1px solid #bee5eb;
 }
 
+/* Адаптивность */
 @media (max-width: 768px) {
     .sudoku-container {
         margin: 1rem;
@@ -258,13 +322,26 @@
         font-size: 1.1rem;
     }
     
+    .sudoku-grid.size-10 .sudoku-cell,
+    .sudoku-grid.size-12 .sudoku-cell,
+    .sudoku-grid.size-14 .sudoku-cell,
+    .sudoku-grid.size-15 .sudoku-cell,
+    .sudoku-grid.size-16 .sudoku-cell {
+        font-size: 0.9rem;
+    }
+    
+    .sudoku-grid.size-20 .sudoku-cell,
+    .sudoku-grid.size-25 .sudoku-cell {
+        font-size: 0.7rem;
+    }
+    
     .controls {
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(10, 1fr);
         gap: 0.3rem;
     }
     
     .number-btn {
-        padding: 0.8rem;
+        padding: 0.6rem;
         font-size: 1rem;
     }
     
@@ -274,6 +351,7 @@
     
     .action-btn {
         min-width: auto;
+        padding: 0.8rem 1rem;
     }
     
     .game-info {
@@ -284,74 +362,10 @@
     .difficulty {
         justify-content: center;
     }
-}
-
-.action-btn.primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.action-btn.warning {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-}
-
-.size-selector {
-    display: flex;
-    gap: 0.5rem;
-    margin: 1rem 0;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.size-btn {
-    padding: 0.5rem 1rem;
-    background: #e9ecef;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 0.9rem;
-}
-
-.size-btn.active {
-    background: #667eea;
-    color: white;
-}
-
-.size-btn:hover:not(.active) {
-    background: #dee2e6;
-}
-
-.sudoku-grid {
-    display: grid;
-    margin: 1rem 0;
-    border: 2px solid #333;
-    background: #333;
-    gap: 1px;
-}
-
-.sudoku-grid.size-4 {
-    grid-template-columns: repeat(4, 1fr);
-}
-
-.sudoku-grid.size-6 {
-    grid-template-columns: repeat(6, 1fr);
-}
-
-.sudoku-grid.size-9 {
-    grid-template-columns: repeat(9, 1fr);
-}
-
-.sudoku-cell {
-    aspect-ratio: 1;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s;
-    user-select: none;
-    position: relative;
-    border: 1px solid #ccc; /* Тонкие границы между всеми ячейками */
+    
+    .size-selector {
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 0.5rem;
+    }
 }
