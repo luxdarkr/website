@@ -20,7 +20,7 @@ class ComponentIncluder {
             `,
             'footer': `
                 <footer>
-                    <p>&copy; 2024 Мой Сайт. Все права защищены.</p>
+                    <p>&copy; 2025 Мой Сайт. Все права защищены.</p>
                 </footer>
             `
         };
