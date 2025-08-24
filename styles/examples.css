@@ -81,8 +81,4 @@
         min-height: auto;
         padding: 0.8rem;
     }
-    
-    .code-editor-container {
-        grid-template-columns: 1fr;
-    }
 }

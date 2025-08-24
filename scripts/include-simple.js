@@ -1,7 +1,7 @@
 class ComponentIncluder {
     constructor() {
-        // Определяем базовый путь от корня проекта
-        this.basePath = window.location.pathname.includes('/pages/') ? '../' : './';
+        // Используем абсолютные пути от корня сайта
+        this.basePath = '/';
         
         this.components = {
             'header': `
@@ -9,7 +9,7 @@ class ComponentIncluder {
                     <nav>
                         <div class="logo">МойСайт</div>
                         <ul>
-                            <li><a href="${this.basePath}index.html">Главная</a></li>
+                            <li><a href="${this.basePath}">Главная</a></li>
                             <li><a href="${this.basePath}pages/code.html">Код</a></li>
                             <li><a href="${this.basePath}pages/games.html">Игры</a></li>
                             <li><a href="${this.basePath}pages/articles.html">Статьи</a></li>
@@ -20,7 +20,7 @@ class ComponentIncluder {
             `,
             'footer': `
                 <footer>
-                    <p>&copy; 2025 Мой Сайт. Все права защищены.</p>
+                    <p>&copy; 2024 Мой Сайт. Все права защищены.</p>
                 </footer>
             `
         };
@@ -44,23 +44,20 @@ class ComponentIncluder {
     }
 
     highlightCurrentPage() {
-        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        const currentPath = window.location.pathname;
         const navLinks = document.querySelectorAll('nav a');
         
         navLinks.forEach(link => {
             const linkHref = link.getAttribute('href');
-            const linkPage = linkHref.split('/').pop();
             
-            // Определяем, активна ли ссылка
-            let isActive = false;
-            
-            if (currentPage === 'index.html' && linkHref.includes('index.html')) {
-                isActive = true;
-            } else if (linkPage === currentPage) {
-                isActive = true;
-            } else if (currentPage === '' && linkHref.includes('index.html')) {
-                isActive = true;
-            }
+            // Сравниваем пути
+            const isActive = 
+                currentPath === linkHref ||
+                (currentPath === '/' && linkHref === '/') ||
+                (currentPath.includes('code.html') && linkHref.includes('code.html')) ||
+                (currentPath.includes('games.html') && linkHref.includes('games.html')) ||
+                (currentPath.includes('articles.html') && linkHref.includes('articles.html')) ||
+                (currentPath.includes('notes.html') && linkHref.includes('notes.html'));
             
             if (isActive) {
                 link.classList.add('active');
@@ -92,6 +89,16 @@ activeLinkStyle.textContent = `
         height: 2px;
         background-color: #ffeb3b;
     }
+    
+    .component-error {
+        background: #ffebee;
+        color: #c62828;
+        padding: 1rem;
+        border: 1px solid #ef5350;
+        border-radius: 5px;
+        margin: 1rem 0;
+        text-align: center;
+    }
 `;
 document.head.appendChild(activeLinkStyle);
 
@@ -110,8 +117,6 @@ function getPath(relativePath) {
         return componentIncluder.getAssetPath(relativePath);
     }
     
-    // Fallback: определяем базовый путь автоматически
-    const isInPages = window.location.pathname.includes('/pages/');
-    const base = isInPages ? '../' : './';
-    return base + relativePath;
+    // Fallback
+    return '/' + relativePath;
 }

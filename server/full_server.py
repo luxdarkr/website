@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 import os
 import re
+import json
 
 app = Flask(__name__, static_folder='../', static_url_path='')
 CORS(app)
@@ -13,17 +14,17 @@ CORS(app)
 def serve_index():
     return send_from_directory('../', 'index.html')
 
-@app.route('/pages/<path:path>')
-def serve_pages(path):
-    return send_from_directory('../pages', path)
+@app.route('/scripts/<path:filename>')
+def serve_scripts(filename):
+    return send_from_directory('../scripts', filename)
 
-@app.route('/styles/<path:path>')
-def serve_styles(path):
-    return send_from_directory('../styles', path)
+@app.route('/styles/<path:filename>')
+def serve_styles(filename):
+    return send_from_directory('../styles', filename)
 
-@app.route('/scripts/<path:path>')
-def serve_scripts(path):
-    return send_from_directory('../scripts', path)
+@app.route('/games/<path:filename>')
+def serve_games(filename):
+    return send_from_directory('../games', filename)
 
 # Python execution endpoint
 @app.route('/run-python', methods=['POST'])
@@ -36,13 +37,11 @@ def run_python():
         if not code:
             return jsonify({'error': 'No code provided'}), 400
         
-        # Создаем временный файл для кода
         with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
             f.write(code)
             temp_file = f.name
         
         try:
-            # Выполняем код с передачей входных данных
             process = subprocess.Popen(
                 ['python3', temp_file],
                 stdin=subprocess.PIPE,
@@ -51,13 +50,11 @@ def run_python():
                 text=True
             )
             
-            # Передаем входные данные в процесс
             stdout, stderr = process.communicate(input=input_data, timeout=10)
             
             output = stdout
             error = stderr
             
-            # Очищаем ANSI escape codes
             ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
             output = ansi_escape.sub('', output)
             error = ansi_escape.sub('', error)
@@ -90,7 +87,6 @@ def run_cpp():
         if not code:
             return jsonify({'error': 'No code provided'}), 400
         
-        # Создаем временные файлы
         with tempfile.NamedTemporaryFile(mode='w', suffix='.cpp', delete=False) as source_file:
             source_file.write(code)
             source_path = source_file.name
@@ -99,7 +95,6 @@ def run_cpp():
             exec_path = exec_file.name
         
         try:
-            # Компилируем C++ код
             compile_result = subprocess.run(
                 ['g++', source_path, '-o', exec_path, '-std=c++11'],
                 capture_output=True,
@@ -116,7 +111,6 @@ def run_cpp():
                     'return_code': compile_result.returncode
                 })
             
-            # Запускаем скомпилированную программу
             process = subprocess.Popen(
                 [exec_path],
                 stdin=subprocess.PIPE,
@@ -125,13 +119,11 @@ def run_cpp():
                 text=True
             )
             
-            # Передаем входные данные в процесс
             stdout, stderr = process.communicate(input=input_data, timeout=10)
             
             output = stdout
             error = stderr
             
-            # Очищаем ANSI escape codes
             ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
             output = ansi_escape.sub('', output)
             error = ansi_escape.sub('', error)
@@ -147,7 +139,6 @@ def run_cpp():
         except Exception as e:
             return jsonify({'error': f'Execution error: {str(e)}'}), 500
         finally:
-            # Удаляем временные файлы
             for file_path in [source_path, exec_path]:
                 if os.path.exists(file_path):
                     os.unlink(file_path)
@@ -159,19 +150,16 @@ def run_cpp():
 def health_check():
     return jsonify({'status': 'ok'})
 
-# Проверка доступности компиляторов
 @app.route('/check-compilers')
 def check_compilers():
     compilers = {}
     
-    # Проверяем Python
     try:
         python_result = subprocess.run(['python3', '--version'], capture_output=True, text=True)
         compilers['python'] = python_result.stdout.strip() if python_result.returncode == 0 else 'Not available'
     except:
         compilers['python'] = 'Not available'
     
-    # Проверяем g++
     try:
         gpp_result = subprocess.run(['g++', '--version'], capture_output=True, text=True)
         if gpp_result.returncode == 0:
@@ -187,7 +175,6 @@ def check_compilers():
 @app.route('/examples/<language>')
 def get_examples(language):
     try:
-        # Правильный путь к config.json
         config_path = os.path.join(os.path.dirname(__file__), '..', 'examples', 'config.json')
         config_path = os.path.abspath(config_path)
         
@@ -201,7 +188,6 @@ def get_examples(language):
         
         examples_list = []
         for example in config[language]['examples']:
-            # Правильный путь к файлам примеров
             file_path = os.path.join(os.path.dirname(__file__), '..', 'examples', example['file'])
             file_path = os.path.abspath(file_path)
             
@@ -229,7 +215,6 @@ def get_examples(language):
 @app.route('/example/<language>/<example_id>')
 def get_example(language, example_id):
     try:
-        # Правильный путь к config.json
         config_path = os.path.join(os.path.dirname(__file__), '..', 'examples', 'config.json')
         config_path = os.path.abspath(config_path)
         
@@ -239,12 +224,10 @@ def get_example(language, example_id):
         if language not in config:
             return jsonify({'error': 'Language not found'}), 404
         
-        # Находим пример по ID
         example = next((ex for ex in config[language]['examples'] if ex['id'] == example_id), None)
         if not example:
             return jsonify({'error': 'Example not found'}), 404
         
-        # Правильный путь к файлу примера
         file_path = os.path.join(os.path.dirname(__file__), '..', 'examples', example['file'])
         file_path = os.path.abspath(file_path)
         

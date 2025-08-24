@@ -17,7 +17,6 @@ class CodeRunner {
     }
 
     async init() {
-        // Загружаем стили
         loadStyles();
         
         this.initCodeMirror();
@@ -51,37 +50,28 @@ class CodeRunner {
     }
 
     setupEventListeners() {
-        // Выбор языка
         document.getElementById('languageSelect').addEventListener('change', (e) => {
             this.changeLanguage(e.target.value);
         });
 
-        // Кнопка запуска
         document.getElementById('runBtn').addEventListener('click', () => {
             this.runCode();
         });
 
-        // Кнопка очистки
         document.getElementById('clearBtn').addEventListener('click', () => {
             this.clearEditor();
         });
 
-        // Табы вывода
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', (e) => {
                 this.uiManager.switchTab(e.target.dataset.tab);
             });
         });
-    
-        document.getElementById('inputData').addEventListener('input', () => {
-            this.saveInputData();
-        });
-        // Автосохранение кода
+
         this.editor.on('change', () => {
             this.saveCode();
         });
 
-        // Обработчик для примеров (делегирование событий)
         const examplesContainer = document.querySelector('.example-buttons');
         if (examplesContainer) {
             examplesContainer.addEventListener('click', (e) => {
@@ -93,17 +83,19 @@ class CodeRunner {
             });
         }
 
+        document.getElementById('inputData').addEventListener('input', () => {
+            this.saveInputData();
+        });
+
         this.loadInputData();
     }
 
     async changeLanguage(language) {
         this.currentLanguage = language;
         
-        // Меняем режим редактора
         const mode = language === 'python' ? 'python' : 'text/x-c++src';
         this.editor.setOption('mode', mode);
         
-        // Загружаем сохранённый код
         const savedCode = localStorage.getItem(`code_${language}`);
         if (savedCode) {
             this.editor.setValue(savedCode);
@@ -111,7 +103,6 @@ class CodeRunner {
             this.editor.setValue(this.getDefaultCode(language));
         }
         
-        // Загружаем и отображаем примеры для нового языка
         await this.examplesManager.loadExamples(language);
         this.uiManager.renderExamples(language, this.examplesManager.examples);
         
@@ -128,9 +119,8 @@ class CodeRunner {
         if (this.isRunning) return;
         
         const code = this.editor.getValue();
-        const inputData = document.getElementById('inputData').value; // Получаем входные данные
+        const inputData = document.getElementById('inputData').value;
         
-        // Проверяем доступность компилятора
         if (!this.executor.isCompilerAvailable(this.currentLanguage)) {
             this.uiManager.showError(`${this.currentLanguage} компилятор не доступен`);
             return;
@@ -161,18 +151,6 @@ class CodeRunner {
         }
     }
 
-    saveInputData() {
-        const inputData = document.getElementById('inputData').value;
-        localStorage.setItem(`input_data`, inputData);
-    }
-
-    loadInputData() {
-        const savedInputData = localStorage.getItem(`input_data`);
-        if (savedInputData) {
-            document.getElementById('inputData').value = savedInputData;
-        }
-    }
-
     clearEditor() {
         if (confirm('Очистить редактор?')) {
             this.editor.setValue('');
@@ -188,15 +166,26 @@ class CodeRunner {
         localStorage.setItem(`code_${this.currentLanguage}`, code);
     }
 
+    saveInputData() {
+        const inputData = document.getElementById('inputData').value;
+        localStorage.setItem(`input_data`, inputData);
+    }
+
     loadSavedCode() {
         const savedCode = localStorage.getItem(`code_${this.currentLanguage}`);
         if (savedCode) {
             this.editor.setValue(savedCode);
         }
     }
+
+    loadInputData() {
+        const savedInputData = localStorage.getItem(`input_data`);
+        if (savedInputData) {
+            document.getElementById('inputData').value = savedInputData;
+        }
+    }
 }
 
-// Инициализируем при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     window.codeRunner = new CodeRunner();
 });
