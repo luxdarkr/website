@@ -19,14 +19,21 @@
         <h1>Шахматы</h1>
         
         <p class="game-description">
-            Классическая шахматная игра. Белые ходят первыми. Используйте все правила: рокировку, взятие на проходе, превращение пешек.
+            Выберите вид шахмат и наслаждайтесь игрой! Доступны классические шахматы, сянци (китайские) и сёги (японские).
         </p>
+
+        <div class="game-type-selector">
+            <button class="game-type-btn active" data-type="chess">Классические</button>
+            <button class="game-type-btn" data-type="xiangqi">Сянци</button>
+            <button class="game-type-btn" data-type="shogi">Сёги</button>
+        </div>
 
         <div class="game-content">
             <div class="game-controls">
                 <button id="new-game-btn" class="btn">Новая игра</button>
                 <button id="undo-btn" class="btn">Отменить ход</button>
                 <button id="flip-board-btn" class="btn">Перевернуть доску</button>
+                <button id="drop-mode-btn" class="btn" style="display: none;">Режим сброса</button>
             </div>
 
             <div class="game-status-bar">
@@ -42,6 +49,13 @@
                 </div>
 
                 <div class="game-sidebar">
+                    <div class="game-rules">
+                        <h3 id="rules-title">Правила</h3>
+                        <div id="rules-content" class="rules-content">
+                            Классические шахматы. Цель - поставить мат королю противника.
+                        </div>
+                    </div>
+
                     <div class="moves-history">
                         <h3>История ходов</h3>
                         <div id="moves-list" class="moves-list"></div>
@@ -57,6 +71,12 @@
                             <div id="captured-black-pieces"></div>
                         </div>
                     </div>
+
+                    <div id="in-hand-pieces" class="in-hand-pieces" style="display: none;">
+                        <h3>Фигуры в руке</h3>
+                        <div id="black-hand" class="hand-container"></div>
+                        <div id="white-hand" class="hand-container"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -70,5 +90,8 @@
 
     <script src="/scripts/include-simple.js"></script>
     <script src="/games/chess.js"></script>
+    <script src="/games/xiangqi.js"></script>
+    <script src="/games/shogi.js"></script>
+    <script src="/games/game-manager.js"></script>
 </body>
 </html>

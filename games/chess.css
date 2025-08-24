@@ -1,6 +1,6 @@
 /* Chess-specific styles */
 .game-main-container {
-    max-width: 1000px;
+    max-width: 1400px;
     margin: 80px auto 40px;
     padding: 0 20px;
 }
@@ -38,6 +38,40 @@
     text-align: center;
 }
 
+.game-type-selector {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0 30px;
+    flex-wrap: wrap;
+}
+
+.game-type-btn {
+    padding: 12px 24px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.game-type-btn:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.game-type-btn.active {
+    background: #007bff;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.game-type-btn.active:hover {
+    background: #0056b3;
+}
+
 .game-content {
     background: white;
     padding: 30px;
@@ -50,7 +84,7 @@
     gap: 15px;
     align-items: center;
     justify-content: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
 }
 
@@ -72,16 +106,36 @@
     box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
 }
 
-.game-info {
+.btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn.drop-mode {
+    background: #28a745;
+}
+
+.btn.drop-mode:hover {
+    background: #218838;
+}
+
+.game-status-bar {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 5px;
-    font-weight: bold;
-    min-width: 150px;
-    padding: 12px;
+    gap: 30px;
+    margin-bottom: 25px;
+    padding: 15px;
     background: #f8f9fa;
-    border-radius: 6px;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.turn-info {
+    font-weight: bold;
+    font-size: 1.1em;
 }
 
 #current-player {
@@ -89,17 +143,21 @@
     font-weight: bold;
 }
 
-#game-status {
+.status-message {
     color: #dc3545;
     font-weight: bold;
-    min-height: 20px;
+    min-height: 24px;
     text-align: center;
 }
 
-.chess-board-container {
+.chess-game-container {
     display: flex;
-    justify-content: center;
-    margin: 25px 0;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.chess-board-container {
+    flex-shrink: 0;
 }
 
 .chess-board {
@@ -107,7 +165,7 @@
     grid-template-columns: repeat(8, 60px);
     grid-template-rows: repeat(8, 60px);
     border: 3px solid #8B4513;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
     background: white;
 }
 
@@ -142,6 +200,10 @@
     background-color: #6a9eda !important;
     box-shadow: inset 0 0 10px rgba(0,0,255,0.5);
     transform: scale(0.95);
+}
+
+.cell.valid-move {
+    position: relative;
 }
 
 .cell.valid-move::after {
@@ -185,32 +247,168 @@
 .cell.check {
     background-color: #ff6b6b !important;
     box-shadow: inset 0 0 10px rgba(255,0,0,0.5);
+    animation: pulseCheck 1s infinite;
+}
+
+@keyframes pulseCheck {
+    0% { background-color: #ff6b6b; }
+    50% { background-color: #ff5252; }
+    100% { background-color: #ff6b6b; }
+}
+
+.piece {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.piece.moving {
+    animation: moveAnimation 0.3s ease;
+}
+
+.piece.captured {
+    animation: captureAnimation 0.4s ease;
+}
+
+@keyframes moveAnimation {
+    0% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes captureAnimation {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.game-sidebar {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    max-height: 800px;
+}
+
+.game-rules {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #dee2e6;
+}
+
+.game-rules h3 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 1.2em;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 8px;
+}
+
+.rules-content {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #495057;
+}
+
+.moves-history {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #dee2e6;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+}
+
+.moves-history h3 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 1.2em;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.moves-list {
+    flex: 1;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    max-height: 300px;
+    min-height: 150px;
+}
+
+.move-item {
+    display: grid;
+    grid-template-columns: 30px 80px 80px;
+    gap: 10px;
+    padding: 6px 8px;
+    border-bottom: 1px solid #f1f1f1;
+    transition: background-color 0.2s ease;
+    align-items: center;
+}
+
+.move-number {
+    color: #6c757d;
+    font-weight: bold;
+    text-align: right;
+}
+
+.move-white {
+    color: #2c3e50;
+    font-weight: 500;
+    text-align: left;
+}
+
+.move-black {
+    color: #495057;
+    font-weight: 500;
+    text-align: left;
 }
 
 .captured-pieces {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 25px;
-    gap: 30px;
+    background: white;
     padding: 20px;
-    background: #f8f9fa;
     border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #dee2e6;
 }
 
 .captured-white, .captured-black {
-    text-align: center;
-    min-width: 150px;
-    padding: 15px;
-    background: white;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+}
+
+.captured-white:last-child, .captured-black:last-child {
+    margin-bottom: 0;
 }
 
 .captured-white h3, .captured-black h3 {
-    margin-bottom: 12px;
+    margin: 0 0 12px 0;
     color: #2c3e50;
     font-size: 1.1em;
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
     padding-bottom: 6px;
 }
 
@@ -234,6 +432,77 @@
     border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     border: 1px solid #dee2e6;
+    transition: transform 0.2s ease;
+}
+
+.captured-piece.new-capture {
+    animation: newCapture 0.6s ease;
+}
+
+@keyframes newCapture {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.in-hand-pieces {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #dee2e6;
+}
+
+.in-hand-pieces h3 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 1.2em;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 8px;
+}
+
+.hand-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.hand-piece {
+    font-size: 20px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hand-piece:hover {
+    background: #e9ecef;
+    transform: scale(1.1);
+}
+
+.hand-piece.selected {
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
 }
 
 /* Coordinate labels */
@@ -251,20 +520,116 @@
     color: rgba(255,255,255,0.7);
 }
 
-/* Responsive design */
+/* Стили для сянци */
+.xiangqi-board {
+    grid-template-columns: repeat(9, 55px) !important;
+    grid-template-rows: repeat(10, 55px) !important;
+    background: #d9b38c;
+    border: 3px solid #8B4513;
+}
+
+.xiangqi-cell {
+    position: relative;
+    border: 1px solid #bf8040;
+    font-size: 35px;
+    font-weight: bold;
+}
+
+.xiangqi-cell.river {
+    background: #99ccff;
+}
+
+.xiangqi-cell.palace {
+    background: linear-gradient(135deg, #ffcccc 0%, #ff9999 100%);
+}
+
+.xiangqi-cell::before {
+    display: none;
+}
+
+.xiangqi-red {
+    color: #ff0000;
+}
+
+.xiangqi-black {
+    color: #000000;
+}
+
+/* Стили для сёги */
+.shogi-board {
+    grid-template-columns: repeat(9, 50px) !important;
+    grid-template-rows: repeat(9, 50px) !important;
+    background: #e6ccb3;
+    border: 3px solid #8B4513;
+}
+
+.shogi-cell {
+    position: relative;
+    border: 1px solid #cc9966;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.shogi-cell::before {
+    display: none;
+}
+
+.shogi-piece {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.shogi-promoted {
+    color: #ff0000;
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+    .chess-game-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .game-sidebar {
+        width: 100%;
+        max-width: 600px;
+        max-height: none;
+    }
+    
+    .chess-board {
+        grid-template-columns: repeat(8, 50px) !important;
+        grid-template-rows: repeat(8, 50px) !important;
+    }
+    
+    .xiangqi-board {
+        grid-template-columns: repeat(9, 45px) !important;
+        grid-template-rows: repeat(10, 45px) !important;
+    }
+    
+    .shogi-board {
+        grid-template-columns: repeat(9, 40px) !important;
+        grid-template-rows: repeat(9, 40px) !important;
+    }
+}
+
 @media (max-width: 768px) {
     .game-main-container {
         padding: 15px;
         margin: 70px auto 30px;
     }
     
-    .chess-board {
-        grid-template-columns: repeat(8, 45px);
-        grid-template-rows: repeat(8, 45px);
+    .game-type-selector {
+        flex-direction: column;
+        align-items: center;
     }
     
-    .cell {
-        font-size: 32px;
+    .game-type-btn {
+        width: 200px;
     }
     
     .game-controls {
@@ -272,26 +637,71 @@
         gap: 12px;
     }
     
-    .captured-pieces {
+    .game-status-bar {
         flex-direction: column;
-        align-items: center;
-        gap: 20px;
+        gap: 15px;
+        text-align: center;
     }
     
     .btn {
         width: 100%;
         max-width: 250px;
     }
+    
+    .chess-board {
+        grid-template-columns: repeat(8, 40px) !important;
+        grid-template-rows: repeat(8, 40px) !important;
+    }
+    
+    .xiangqi-board {
+        grid-template-columns: repeat(9, 35px) !important;
+        grid-template-rows: repeat(10, 35px) !important;
+    }
+    
+    .shogi-board {
+        grid-template-columns: repeat(9, 30px) !important;
+        grid-template-rows: repeat(9, 30px) !important;
+    }
+    
+    .cell {
+        font-size: 30px;
+    }
+    
+    .xiangqi-cell {
+        font-size: 25px;
+    }
+    
+    .shogi-cell {
+        font-size: 16px;
+    }
 }
 
 @media (max-width: 480px) {
     .chess-board {
-        grid-template-columns: repeat(8, 35px);
-        grid-template-rows: repeat(8, 35px);
+        grid-template-columns: repeat(8, 35px) !important;
+        grid-template-rows: repeat(8, 35px) !important;
+    }
+    
+    .xiangqi-board {
+        grid-template-columns: repeat(9, 30px) !important;
+        grid-template-rows: repeat(10, 30px) !important;
+    }
+    
+    .shogi-board {
+        grid-template-columns: repeat(9, 25px) !important;
+        grid-template-rows: repeat(9, 25px) !important;
     }
     
     .cell {
         font-size: 25px;
+    }
+    
+    .xiangqi-cell {
+        font-size: 20px;
+    }
+    
+    .shogi-cell {
+        font-size: 14px;
     }
     
     .captured-piece {
@@ -310,5 +720,15 @@
     
     .game-main-container h1 {
         font-size: 2em;
+    }
+    
+    .moves-history, .captured-pieces, .in-hand-pieces {
+        padding: 15px;
+    }
+    
+    .move-item {
+        grid-template-columns: 25px 60px 60px;
+        gap: 5px;
+        font-size: 12px;
     }
 }
