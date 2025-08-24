@@ -14,30 +14,50 @@
         </div>
     </div>
 
-    <main class="game-container">
+    <main class="game-main-container">
+        <a href="/pages/games.html" class="back-btn">← Назад к играм</a>
         <h1>Шахматы</h1>
         
-        <div class="game-controls">
-            <button id="new-game-btn" class="btn">Новая игра</button>
-            <button id="flip-board-btn" class="btn">Перевернуть доску</button>
-            <div class="game-info">
-                <span>Ход: <span id="current-player">белых</span></span>
-                <span id="game-status"></span>
-            </div>
-        </div>
+        <p class="game-description">
+            Классическая шахматная игра. Белые ходят первыми. Используйте все правила: рокировку, взятие на проходе, превращение пешек.
+        </p>
 
-        <div class="chess-board-container">
-            <div id="chess-board" class="chess-board"></div>
-        </div>
-
-        <div class="captured-pieces">
-            <div class="captured-white">
-                <h3>Съедено белых:</h3>
-                <div id="captured-white-pieces"></div>
+        <div class="game-content">
+            <div class="game-controls">
+                <button id="new-game-btn" class="btn">Новая игра</button>
+                <button id="undo-btn" class="btn">Отменить ход</button>
+                <button id="flip-board-btn" class="btn">Перевернуть доску</button>
             </div>
-            <div class="captured-black">
-                <h3>Съедено чёрных:</h3>
-                <div id="captured-black-pieces"></div>
+
+            <div class="game-status-bar">
+                <div class="turn-info">
+                    <span>Ход: <span id="current-player">белых</span></span>
+                </div>
+                <div id="game-status" class="status-message"></div>
+            </div>
+
+            <div class="chess-game-container">
+                <div class="chess-board-container">
+                    <div id="chess-board" class="chess-board"></div>
+                </div>
+
+                <div class="game-sidebar">
+                    <div class="moves-history">
+                        <h3>История ходов</h3>
+                        <div id="moves-list" class="moves-list"></div>
+                    </div>
+                    
+                    <div class="captured-pieces">
+                        <div class="captured-white">
+                            <h3>Съедено белых:</h3>
+                            <div id="captured-white-pieces"></div>
+                        </div>
+                        <div class="captured-black">
+                            <h3>Съедено чёрных:</h3>
+                            <div id="captured-black-pieces"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
