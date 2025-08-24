@@ -129,13 +129,186 @@ class SudokuGame {
     }
 
     generateSudoku() {
-        // Создаем решенное судоку
-        this.solution = this.generateSolvedBoard();
+        let attempts = 0;
+        const maxAttempts = 100;
         
-        // Создаем головоломку на основе решения
-        this.puzzle = this.createPuzzle(this.solution, this.difficulty);
-        
+        while (attempts < maxAttempts) {
+            try {
+                // Создаем решенное судоку
+                this.solution = this.generateSolvedBoard();
+                
+                // Создаем головоломку и проверяем уникальность
+                this.puzzle = this.createPuzzleWithUniqueSolution(this.solution, this.difficulty);
+                
+                this.displayBoard();
+                return;
+            } catch (error) {
+                attempts++;
+                if (attempts >= maxAttempts) {
+                    console.warn('Не удалось сгенерировать уникальное судоку, используем fallback');
+                    this.createFallbackPuzzle();
+                    return;
+                }
+            }
+        }
+    }
+
+    createFallbackPuzzle() {
+        // Простые валидные судоку для каждого размера
+        const fallbackPuzzles = {
+            4: {
+                solution: [
+                    [1, 2, 3, 4],
+                    [3, 4, 1, 2],
+                    [2, 1, 4, 3],
+                    [4, 3, 2, 1]
+                ],
+                puzzle: [
+                    [1, 0, 3, 0],
+                    [0, 4, 0, 2],
+                    [2, 0, 4, 0],
+                    [0, 3, 0, 1]
+                ]
+            },
+            6: {
+                solution: [
+                    [1, 2, 3, 4, 5, 6],
+                    [4, 5, 6, 1, 2, 3],
+                    [2, 3, 4, 5, 6, 1],
+                    [5, 6, 1, 2, 3, 4],
+                    [3, 4, 5, 6, 1, 2],
+                    [6, 1, 2, 3, 4, 5]
+                ],
+                puzzle: [
+                    [1, 0, 3, 0, 5, 0],
+                    [0, 5, 0, 1, 0, 3],
+                    [2, 0, 4, 0, 6, 0],
+                    [0, 6, 0, 2, 0, 4],
+                    [3, 0, 5, 0, 1, 0],
+                    [0, 1, 0, 3, 0, 5]
+                ]
+            },
+            9: {
+                solution: [
+                    [5, 3, 4, 6, 7, 8, 9, 1, 2],
+                    [6, 7, 2, 1, 9, 5, 3, 4, 8],
+                    [1, 9, 8, 3, 4, 2, 5, 6, 7],
+                    [8, 5, 9, 7, 6, 1, 4, 2, 3],
+                    [4, 2, 6, 8, 5, 3, 7, 9, 1],
+                    [7, 1, 3, 9, 2, 4, 8, 5, 6],
+                    [9, 6, 1, 5, 3, 7, 2, 8, 4],
+                    [2, 8, 7, 4, 1, 9, 6, 3, 5],
+                    [3, 4, 5, 2, 8, 6, 1, 7, 9]
+                ],
+                puzzle: [
+                    [5, 3, 0, 0, 7, 0, 0, 0, 0],
+                    [6, 0, 0, 1, 9, 5, 0, 0, 0],
+                    [0, 9, 8, 0, 0, 0, 0, 6, 0],
+                    [8, 0, 0, 0, 6, 0, 0, 0, 3],
+                    [4, 0, 0, 8, 0, 3, 0, 0, 1],
+                    [7, 0, 0, 0, 2, 0, 0, 0, 6],
+                    [0, 6, 0, 0, 0, 0, 2, 8, 0],
+                    [0, 0, 0, 4, 1, 9, 0, 0, 5],
+                    [0, 0, 0, 0, 8, 0, 0, 7, 9]
+                ]
+            }
+        };
+
+        const fallback = fallbackPuzzles[this.boardSize];
+        this.solution = fallback.solution;
+        this.puzzle = fallback.puzzle;
         this.displayBoard();
+    }
+
+    createPuzzleWithUniqueSolution(solution, difficulty) {
+        const puzzle = solution.map(row => [...row]);
+        const totalCells = this.boardSize * this.boardSize;
+        
+        const cellsToRemove = {
+            easy: Math.floor(totalCells * 0.4),
+            medium: Math.floor(totalCells * 0.5),  
+            hard: Math.floor(totalCells * 0.6)
+        };
+
+        const cells = this.shuffleArray(Array.from({length: totalCells}, (_, i) => i));
+        let removedCount = 0;
+        
+        for (let i = 0; i < cells.length && removedCount < cellsToRemove[difficulty]; i++) {
+            const index = cells[i];
+            const row = Math.floor(index / this.boardSize);
+            const col = index % this.boardSize;
+            const originalValue = puzzle[row][col];
+            
+            if (originalValue !== 0) {
+                // Временно удаляем значение
+                puzzle[row][col] = 0;
+                
+                // Проверяем, осталось ли решение уникальным
+                if (!this.hasUniqueSolution(JSON.parse(JSON.stringify(puzzle)))) {
+                    // Если решение не уникально, возвращаем значение
+                    puzzle[row][col] = originalValue;
+                } else {
+                    removedCount++;
+                }
+            }
+        }
+        
+        if (removedCount < cellsToRemove[difficulty] * 0.8) {
+            throw new Error('Не удалось создать головоломку с уникальным решением');
+        }
+        
+        return puzzle;
+    }
+
+    hasUniqueSolution(puzzle) {
+        // Создаем копию для решения
+        const board = puzzle.map(row => [...row]);
+        let solutionCount = 0;
+        
+        // Используем backtracking для подсчета решений
+        const countSolutions = (board) => {
+            if (solutionCount > 1) return; // Прерываем если нашли больше 1 решения
+            
+            for (let row = 0; row < this.boardSize; row++) {
+                for (let col = 0; col < this.boardSize; col++) {
+                    if (board[row][col] === 0) {
+                        for (let num = 1; num <= this.boardSize; num++) {
+                            if (this.isValidPlacement(board, row, col, num)) {
+                                board[row][col] = num;
+                                
+                                if (this.isBoardComplete(board)) {
+                                    solutionCount++;
+                                } else {
+                                    countSolutions(board);
+                                }
+                                
+                                board[row][col] = 0;
+                                
+                                if (solutionCount > 1) return;
+                            }
+                        }
+                        return;
+                    }
+                }
+            }
+            
+            if (this.isBoardComplete(board)) {
+                solutionCount++;
+            }
+        };
+        
+        countSolutions(board);
+        return solutionCount === 1;
+    }
+
+    isBoardComplete(board) {
+        for (let row = 0; row < this.boardSize; row++) {
+            for (let col = 0; col < this.boardSize; col++) {
+                if (board[row][col] === 0) return false;
+                if (!this.isValidPlacement(board, row, col, board[row][col])) return false;
+            }
+        }
+        return true;
     }
 
     generateSolvedBoard() {
@@ -194,12 +367,23 @@ class SudokuGame {
         this.grid.innerHTML = '';
         this.grid.className = `sudoku-grid size-${this.boardSize}`;
         
+        // Добавляем классы для границ блоков
+        this.addBlockBorders();
+        
         for (let row = 0; row < this.boardSize; row++) {
             for (let col = 0; col < this.boardSize; col++) {
                 const cell = document.createElement('div');
                 cell.className = 'sudoku-cell';
                 cell.dataset.row = row;
                 cell.dataset.col = col;
+                
+                // Добавляем классы для границ
+                if (this.isBlockBorderRight(col)) {
+                    cell.classList.add('border-right');
+                }
+                if (this.isBlockBorderBottom(row)) {
+                    cell.classList.add('border-bottom');
+                }
                 
                 if (this.puzzle[row][col] !== 0) {
                     cell.textContent = this.puzzle[row][col];
@@ -211,17 +395,69 @@ class SudokuGame {
         }
     }
 
+    isBlockBorderRight(col) {
+        if (this.boardSize === 4) return col % 2 === 1 && col !== 3;
+        if (this.boardSize === 6) return col % 3 === 2 && col !== 5;
+        if (this.boardSize === 9) return col % 3 === 2 && col !== 8;
+        return false;
+    }
+
+    isBlockBorderBottom(row) {
+        if (this.boardSize === 4) return row % 2 === 1 && row !== 3;
+        if (this.boardSize === 6) return (row === 1 || row === 3) && row !== 5;
+        if (this.boardSize === 9) return (row === 2 || row === 5) && row !== 8;
+        return false;
+    }
+
+    addBlockBorders() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .border-right {
+                border-right: 2px solid #333 !important;
+            }
+            
+            .border-bottom {
+                border-bottom: 2px solid #333 !important;
+            }
+            
+            .sudoku-grid.size-4 .sudoku-cell:nth-child(4n) {
+                border-right: none !important;
+            }
+            
+            .sudoku-grid.size-6 .sudoku-cell:nth-child(6n) {
+                border-right: none !important;
+            }
+            
+            .sudoku-grid.size-9 .sudoku-cell:nth-child(9n) {
+                border-right: none !important;
+            }
+            
+            .sudoku-grid.size-4 .sudoku-cell:nth-child(n+13) {
+                border-bottom: none !important;
+            }
+            
+            .sudoku-grid.size-6 .sudoku-cell:nth-child(n+31) {
+                border-bottom: none !important;
+            }
+            
+            .sudoku-grid.size-9 .sudoku-cell:nth-child(n+55) {
+                border-bottom: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     selectCell(cell) {
+        // Всегда снимаем выделение с предыдущей ячейки
         if (this.selectedCell) {
             this.selectedCell.classList.remove('selected');
             this.clearHighlights();
         }
         
-        if (!cell.classList.contains('fixed')) {
-            cell.classList.add('selected');
-            this.selectedCell = cell;
-            this.highlightRelatedCells();
-        }
+        // Выделяем новую ячейку, даже если она фиксированная
+        cell.classList.add('selected');
+        this.selectedCell = cell;
+        this.highlightRelatedCells();
     }
 
     highlightRelatedCells() {
@@ -231,12 +467,16 @@ class SudokuGame {
         const col = parseInt(this.selectedCell.dataset.col);
         const value = this.selectedCell.textContent;
 
+        this.clearHighlights();
+
         // Подсвечиваем ячейки с тем же номером
-        document.querySelectorAll('.sudoku-cell').forEach(cell => {
-            if (cell.textContent === value && value !== '') {
-                cell.classList.add('same-number');
-            }
-        });
+        if (value !== '') {
+            document.querySelectorAll('.sudoku-cell').forEach(cell => {
+                if (cell.textContent === value) {
+                    cell.classList.add('same-number');
+                }
+            });
+        }
 
         // Подсвечиваем связанные ячейки
         document.querySelectorAll('.sudoku-cell').forEach(cell => {
@@ -245,7 +485,7 @@ class SudokuGame {
             
             if (cellRow === row || cellCol === col || 
                 (Math.floor(cellRow / this.blockHeight) === Math.floor(row / this.blockHeight) && 
-                 Math.floor(cellCol / this.blockWidth) === Math.floor(col / this.blockWidth))) {
+                Math.floor(cellCol / this.blockWidth) === Math.floor(col / this.blockWidth))) {
                 cell.classList.add('highlighted');
             }
         });
@@ -313,7 +553,7 @@ class SudokuGame {
 
         const newCell = this.grid.querySelector(`[data-row="${newRow}"][data-col="${newCol}"]`);
         if (newCell) {
-            this.selectCell(newCell);
+            this.selectCell(newCell); // Выделяем даже фиксированные ячейки
         }
     }
 
@@ -481,21 +721,26 @@ class SudokuGame {
     isValidPlacement(board, row, col, num) {
         // Проверка ряда
         for (let x = 0; x < this.boardSize; x++) {
-            if (board[row][x] === num) return false;
+            if (board[row][x] === num && x !== col) return false;
         }
 
         // Проверка колонки
         for (let x = 0; x < this.boardSize; x++) {
-            if (board[x][col] === num) return false;
+            if (board[x][col] === num && x !== row) return false;
         }
 
         // Проверка блока
-        const startRow = row - row % this.blockHeight;
-        const startCol = col - col % this.blockWidth;
+        const startRow = Math.floor(row / this.blockHeight) * this.blockHeight;
+        const startCol = Math.floor(col / this.blockWidth) * this.blockWidth;
         
         for (let i = 0; i < this.blockHeight; i++) {
             for (let j = 0; j < this.blockWidth; j++) {
-                if (board[i + startRow][j + startCol] === num) return false;
+                const checkRow = startRow + i;
+                const checkCol = startCol + j;
+                if (board[checkRow][checkCol] === num && 
+                    (checkRow !== row || checkCol !== col)) {
+                    return false;
+                }
             }
         }
 
